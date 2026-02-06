@@ -4,44 +4,36 @@ from bleak import BleakScanner, BleakClient
 
 async def run():
     
-    # 1. Skanowanie urządzeń
     devices = await BleakScanner.discover()
-    
     target_device = None
     
-    # Szukamy kostki. Często mają w nazwie "QY", "Qiyi", "Smart" lub podobne.
-    # Jeśli Twoja kostka nazywa się inaczej, skrypt wypisze wszystkie urządzenia.
     for d in devices:
-        name = d.name or "Nieznane"
-        print(f"Znaleziono: {name} | Adres: {d.address}")
+        name = d.name or "unknown"
+        print(f"Found: {name} | Address: {d.address}")
         
-        # Prosta heurystyka do znalezienia kostki
         if "QY" in name or "Smart" in name or "Cube" in name:
             target_device = d
 
     if not target_device:
-        print("\nNie udało się automatycznie wykryć kostki po nazwie.")
-        print("Skopiuj adres MAC swojej kostki z listy powyżej i wpisz go w kodzie ręcznie.")
+        print("QiYi smart cube not found.")
         return
 
-    print(f"\n--- PRÓBA POŁĄCZENIA Z: {target_device.name} ({target_device.address}) ---")
+    print(f"\n CONNECTING TO: {target_device.name} ({target_device.address})")
 
-    # 2. Łączenie
     try:
         async with BleakClient(target_device.address) as client:
-            print(f"POŁĄCZONO: {client.is_connected}")
+            print(f"CONNECTED: {client.is_connected}")
             
-            # 3. Pobieranie usług (Services)
-            print("\nDostępne usługi i charakterystyki:")
+            print("\nAvailable services and characteristics:")
             for service in client.services:
                 print(f"[Service] {service.uuid}")
                 for char in service.characteristics:
                     print(f"  - [Char] {char.uuid} ({', '.join(char.properties)})")
             
-            print("\nTest zakończony sukcesem. Połączenie działa.")
+            print("\nTest ended successfully.")
             
     except Exception as e:
-        print(f"BŁĄD POŁĄCZENIA: {e}")
+        print(f"ERROR: {e}")
 
 
 if __name__ == "__main__":
