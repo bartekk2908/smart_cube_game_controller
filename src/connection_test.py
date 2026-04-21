@@ -1,7 +1,6 @@
 import asyncio
 from bleak import BleakScanner, BleakClient
 
-
 async def run():
     
     devices = await BleakScanner.discover()
@@ -34,7 +33,6 @@ async def run():
             
     except Exception as e:
         print(f"ERROR: {e}")
-
 
 if __name__ == "__main__":
     asyncio.run(run())

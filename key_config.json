@@ -1,0 +1,14 @@
+{
+    "R":  {"action": "PRESS", "key": "d"},
+    "R'": {"action": "RELEASE", "key": "d"},
+    "L":  {"action": "RELEASE", "key": "a"},
+    "L'": {"action": "PRESS", "key": "a"},
+    "U":  {"action": "CLICK", "key": "space", "duration": 0.0},
+    "U'": {"action": "CLICK", "key": "space", "duration": 0.0},
+    "D":  {"action": "CLICK", "key": "down", "duration": 0.0},
+    "D'": {"action": "CLICK", "key": "down", "duration": 0.0},
+    "F":  {"action": "PRESS", "key": "ctrl_r"},
+    "F'": {"action": "RELEASE", "key": "ctrl_r"},
+    "B":  {"action": "RELEASE", "key": "shift_r"},
+    "B'": {"action": "PRESS", "key": "shift_r"}
+}

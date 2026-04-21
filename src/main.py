@@ -5,6 +5,7 @@ from bleak import BleakClient, BleakScanner
 from communication_utils import crc16_modbus, decrypt_data, encrypt_data
 import input_mapper
 
+# yhttps://codeberg.org/Flying-Toast/qiyi_smartcube_protocol/src/branch/master
 
 CHAR_UUID = "0000fff6-0000-1000-8000-00805f9b34fb"
 
@@ -13,7 +14,6 @@ MOVES_MAP = {
     0x5: "D'", 0x6: "D", 0x7: "U'", 0x8: "U",
     0x9: "F'", 0x0a: "F", 0x0b: "B'", 0x0c: "B"
 }
-
 
 async def main():
     target_device = None
@@ -95,10 +95,9 @@ async def main():
         print("Sending App Hello...")
         await client.write_gatt_char(CHAR_UUID, encrypt_data(payload))
 
-        print("--- Waiting for moves (Silent Mode for Speed) ---")
+        print("--- Waiting for moves ---")
         while True:
             await asyncio.sleep(1)
-
 
 if __name__ == "__main__":
     try:

@@ -1,29 +1,39 @@
+import json
+import threading
+import time
 from pynput.keyboard import Key, Controller
 
-
 keyboard = Controller()
-
 HELD_KEYS = set()
+KEY_BEHAVIOR = {}
 
-KEY_BEHAVIOR = {
-    "R":  {"action": "PRESS", "key": "d"},
-    "R'": {"action": "RELEASE", "key": "d"},
+key_config_file = "key_config.json"
 
-    "L": {"action": "RELEASE", "key": "a"},
-    "L'":  {"action": "PRESS", "key": "a"},
+def get_key_object(key_str):
+    if hasattr(Key, key_str):
+        return getattr(Key, key_str)
+    return key_str
 
-    "U":  {"action": "CLICK", "key": Key.space},
-    "U'":  {"action": "CLICK", "key": Key.space},
+def load_config(config_file_name):
+    global KEY_BEHAVIOR
+    try:
+        with open(config_file_name, 'r') as f:
+            raw_config = json.load(f)
+            
+        for move, behavior in raw_config.items():
+            KEY_BEHAVIOR[move] = {
+                "action": behavior["action"],
+                "key": get_key_object(behavior["key"]),
+                "duration": behavior.get("duration", 0.0) 
+            }
+    except FileNotFoundError:
+        print("config file not found.")
 
-    "D":  {"action": "CLICK", "key": Key.down},
-    "D'":  {"action": "CLICK", "key": Key.down},
+load_config(key_config_file)
 
-    "F":  {"action": "PRESS", "key": Key.ctrl_r},
-    "F'":  {"action": "RELEASE", "key": Key.ctrl_r},
-
-    "B":  {"action": "RELEASE", "key": Key.shift_r},
-    "B'":  {"action": "PRESS", "key": Key.shift_r},
-}
+def delayed_release(key, delay):
+    time.sleep(delay)
+    keyboard.release(key)
 
 def handle_cube_move(move_name):
     behavior = KEY_BEHAVIOR.get(move_name)
@@ -36,17 +46,19 @@ def handle_cube_move(move_name):
 
     if action == "PRESS":
         if key not in HELD_KEYS:
-            # print(f"  [Keyboard] Holding down: {key}")
             keyboard.press(key)
             HELD_KEYS.add(key)
     
     elif action == "RELEASE":
         if key in HELD_KEYS:
-            # print(f"  [Keyboard] Releasing: {key}")
             keyboard.release(key)
             HELD_KEYS.remove(key)
             
     elif action == "CLICK":
-        # print(f"  [Keyboard] Clicking: {key}")
+        duration = behavior.get("duration", 0.0)
         keyboard.press(key)
-        keyboard.release(key)
+        
+        if duration > 0:
+            threading.Thread(target=delayed_release, args=(key, duration), daemon=True).start()
+        else:
+            keyboard.release(key)
